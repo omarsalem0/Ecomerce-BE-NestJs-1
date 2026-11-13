@@ -1,25 +1,13 @@
 import dotenv from "dotenv"
-import path from "node:path"
-
 
 dotenv.config({path:['.env.dev','.env.prod']})
 
-// const env_mood=process.env.ENV_MOOD
-
-
-// const serverUrl=process.env.SERVER_URL
-
-// const client_Id=process.env.CLIENT_ID
-
-// const accessKey_AWS=process.env.ACCESS_KEY_AWS
-// const secret_AccessKey_AWS=process.env.SECRET_ACCESS_KEY_AWS
-// const AWS_Bucket_Name=process.env.AWS_BUCKET_NAME
-export const env ={
+export const env = {
     get port(){
         return process.env.PORT || 3000
     },
     get dataBaseUrl(){
-        return process.env.DATABASEURL as string
+        return (process.env.DB_URL || process.env.DATABASEURL) as string
     },
     get userSignature(){
         return process.env.USER_SIGNATURE as string
@@ -43,21 +31,24 @@ export const env ={
         return process.env.CLOUD_NAME as string
     },
     get api_key(){
-        return process.env.API_KET  as string
+        return (process.env.API_KEY || process.env.API_KET) as string
     },
     get api_secret(){
-        return process.env.API_SECRET  as string
+        return process.env.API_SECRET as string
     },
     get googleEmail(){
-        return process.env.GOOGLE_ACOUNCT_EMAIL
-        
+        return process.env.GOOGLE_ACCOUNT_EMAIL || process.env.GOOGLE_ACOUNCT_EMAIL
     },
     get googleAppPassword(){
         return process.env.GOOGLE_APP_PASSWORD
-        
     },
     get serverUrl(){
         return process.env.SERVER_URL
+    },
+    get stripeSecretKey(){
+        return process.env.STRIPE_SECRET_KEY
+    },
+    get stripeWebhookSecret(){
+        return process.env.STRIPE_WEBHOOK_SECRET
     }
-
 }

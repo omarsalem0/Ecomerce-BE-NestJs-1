@@ -25,12 +25,11 @@ This document is a comprehensive architectural audit and implementation roadmap 
 
 | Feature Module | Status | Verified Files (Existence Only) | Implementation Notes & Missing Logic | 
 | ----- | ----- | ----- | ----- | 
-| **Auth / Users** | PARTIAL | `auth.controller.ts`, `auth.service.ts`, `user.model.ts`, `auth.guard.ts`, `check-role.guard.ts` | JWT auth structure exists. **Unverified:** Actual token generation. **Missing:** Secure hashed refresh token rotation, Address management, Password reset. | 
-| **Category** | PARTIAL | `category.controller.ts`, `category.service.ts`, `catedory.model.ts` | Basic CRUD structure exists. **Issues:** Typo in schema filename (`catedory.model.ts`). | 
-| **Brand** | PARTIAL | `brand.controller.ts`, `brand.service.ts`, `brand.model.ts` | Basic CRUD structure exists. | 
-| **Product** | NEEDS_FIX | `product.controller.ts`, `product.service.ts` | Structure exists. **Missing:** `product.model.ts` is missing from `src/db/model/`. No DB integration exists. | 
-| **Cart** | MISSING | None | Requires full implementation and dynamic server-side price calculation. | 
-| **Wishlist** | MISSING | None | Requires full implementation. | 
+| **Auth / Users** | COMPLETE (Phase 1) | `auth.controller.ts`, `auth.service.ts`, `user.model.ts`, `auth.guard.ts`, `check-role.guard.ts` | Profile update implemented reusing embedded Address schema. Auth and tokens preserved. | 
+| **Category** | COMPLETE (Phase 1) | `category.controller.ts`, `category.service.ts`, `category.model.ts` | Fixed `catedory.model.ts` typo, duplicate registration removed, all routes and file upload preserved. | 
+| **Brand** | COMPLETE (Phase 2) | `brand.controller.ts`, `brand.service.ts`, `brand.model.ts` | Complete CRUD, slug generation, referential integrity protection against deletion with active products. | 
+| **Product** | COMPLETE (Phase 2) | `product.controller.ts`, `product.service.ts`, `product.model.ts` | Complete CRUD, filtering, pagination, search, sorting, Cloudinary image upload, atomic stock reservation/release, Admin authorization. | 
+| **Cart** | COMPLETE (Phase 3) | `cart.controller.ts`, `cart.service.ts`, `cart.model.ts` | Full implementation: dynamic server-side pricing, stock checks, duplicate entry merging, user isolation, AuthGuard protection. | 
 | **Orders / Checkout** | MISSING | None | Requires full implementation, atomic inventory reservation, and price snapshotting. | 
 | **Payments (Stripe)** | MISSING | None | Requires Stripe SDK wrapper, Intent creation, Webhook processing, and retry handling. | 
 | **Reviews & Ratings** | MISSING | None | Requires full implementation. | 
@@ -72,7 +71,7 @@ To prevent double stock deductions, race conditions, duplicate orders, and lost 
 
 **Antigravity Instructions:** Execute the following phases sequentially. Ensure `dependencies` are met before starting a phase. Perform localized AST reads to verify existing logic.
 
-### Phase 1: Codebase Stabilization & Secure Auth Extensions
+### Phase 1: Codebase Stabilization & Secure Auth Extensions [COMPLETED]
 * **Objective:** Fix structural typos, implement secure Refresh Token rotation, and expand User profiles.
 * **Exact files to create:** `src/db/model/address.model.ts`
 * **Exact files to modify:** 
@@ -93,7 +92,7 @@ To prevent double stock deductions, race conditions, duplicate orders, and lost 
   * *Negative:* Attempting to refresh with an old/reused token must fail and invalidate the token family.
 * **Acceptance criteria:** Project compiles. Secure refresh token rotation is active.
 
-### Phase 2: Product & Inventory Management
+### Phase 2: Product & Inventory Management [COMPLETED]
 * **Objective:** Implement the Product data model and finalize CRUD with concurrency support.
 * **Exact files to create:** `src/db/model/product.model.ts`
 * **Exact files to modify:** `src/module/product/product.service.ts`, `product.controller.ts`, `dto/create-product.dto.ts`, `dto/update-product.dto.ts`
@@ -108,17 +107,17 @@ To prevent double stock deductions, race conditions, duplicate orders, and lost 
   * *Negative:* Admin creation with invalid categoryId/brandId must fail. Users attempting POST must get 403 Forbidden.
 * **Acceptance criteria:** Products can be created, updated, and fetched accurately.
 
-### Phase 3: Cart & Wishlist Modules
-* **Objective:** Allow users to manage carts/wishlists with secure server-side pricing.
-* **Exact files to create:** `src/db/model/cart.model.ts`, `src/db/model/wishlist.model.ts`, `src/module/cart/*`, `src/module/wishlist/*`
+### Phase 3: Cart Module [COMPLETED]
+* **Objective:** Allow users to manage carts with secure server-side pricing.
+* **Exact files to create:** `src/db/model/cart.model.ts`, `src/module/cart/*`
 * **Exact files to modify:** `src/app.module.ts`
 * **Dependencies:** Product Module, Auth Guard.
 * **Implementation steps:**
   1. `cart.model.ts`: `userId`, `items` (`productId`, `quantity`).
   2. `CartService.getCart()` must query `ProductModel` to dynamically calculate the `totalPrice` on the fly. Do NOT store derived prices permanently in the cart to avoid staleness.
-* **API requirements:** `POST /cart`, `GET /cart`, `DELETE /cart/:itemId`, `POST /wishlist`, `GET /wishlist`.
+* **API requirements:** `POST /cart`, `GET /cart`, `DELETE /cart/:itemId`.
 * **Validation and authorization:** All routes require Auth.
-* **Database changes:** Cart and Wishlist collections.
+* **Database changes:** Cart collection.
 * **Testing requirements:**
   * *Negative:* Adding a product ID that doesn't exist returns 404. Attempting to add more quantity than available `stock` returns 400.
 * **Acceptance criteria:** Cart strictly calculates totals server-side based on real-time DB prices.

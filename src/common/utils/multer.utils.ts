@@ -11,7 +11,7 @@ export const multerOption=({storageKey=MulterEnums.diskStorage}:{
 
      return {
         storage: storageKey==MulterEnums.memoryStorage? multer.memoryStorage() : multer.diskStorage({
-        // destination:'./upoluds',
+
        destination: function (req:Request,file:Express.Multer.File,cb:any){
             cb(null,tmpdir())
         },

@@ -1,0 +1,43 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type CartItem {
+  productId: ID!
+  name: String!
+  price: Float!
+  quantity: Int!
+  subtotal: Float!
+  images: [String!]!
+  availableStock: Int!
+  inStock: Boolean!
+}
+
+type Cart {
+  id: ID
+  userId: ID!
+  items: [CartItem!]!
+  totalPrice: Float!
+  totalItems: Int!
+}
+
+type Query {
+  getMyCart: Cart!
+}
+
+type Mutation {
+  addToCart(productId: String, quantity: Int, input: AddToCartInput): Cart!
+  updateCartItem(productId: String, quantity: Int, input: UpdateCartItemInput): Cart!
+  removeFromCart(productId: String!): Cart!
+  clearCart: Cart!
+}
+
+input AddToCartInput {
+  productId: String!
+  quantity: Int! = 1
+}
+
+input UpdateCartItemInput {
+  productId: String!
+  quantity: Int!
+}

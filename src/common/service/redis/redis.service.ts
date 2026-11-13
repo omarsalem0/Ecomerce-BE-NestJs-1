@@ -13,7 +13,7 @@ export class RedisService  {
             url:env.redisUrl as string
         })
      this.handleConnection()
-    //  this.client.flushDb()
+
     }
 
     async handleConnection(){ 
