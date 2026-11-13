@@ -1,11 +1,11 @@
 
 export enum genderEnum{
    Male= 'Male',
-   Female=' Female'
+   Female='Female'
 }
-export const enum roleEnum{
-    Admin,
-    User
+export enum roleEnum {
+  Admin = 0,
+  User = 1,
 }
 export  enum providerEnum{
    System= "System",

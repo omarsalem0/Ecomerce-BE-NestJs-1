@@ -1,7 +1,9 @@
-import { genderEnum } from '../common/enums/user.enums.js';
-import { hashData } from '../common/security/hashdata.js';
-import { IUser } from './../common/interFace/user.inerface.js';
+import { Address, AddressSchema } from './address.model.js';
 import { MongooseModule, Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
+import { genderEnum,roleEnum } from "../../common/enums/user.enums.js";
+import { hashData } from "../../common/security/hashdata.js";
+import { HydratedDocument } from "mongoose";
+
 
 
 @Schema({
@@ -39,7 +41,8 @@ export class User {
         password:string
         @Prop({
             type:String,
-
+            required:false,
+            trim:true
         })
         phone:string
         @Prop({
@@ -55,16 +58,21 @@ export class User {
             },
             default:genderEnum.Male
         })
-        gender:string
+        gender:genderEnum
         @Prop({
                     type:Number,
                     enum:{
-                        values:Object.values(genderEnum),
-                        message:'{VALUE} is not a valid gender'
+                        values:[roleEnum.User,roleEnum.Admin],
+                        message:'{VALUE} is not a valid role'
                     },
-                    default:genderEnum.Male
+                    default:roleEnum.User
                 })
-        role:number
+        role:roleEnum
+        @Prop({
+            type:[AddressSchema],
+            default:[]
+        })
+        address:Address[]
 
 }
 const userSchema=SchemaFactory.createForClass(User)
@@ -74,10 +82,11 @@ userSchema.pre("save",async function(){
     }
 })
 userSchema.virtual('userName').get(function(this:any){
-    return this.firstName + '-' +this.lastName
+    return this.firstName + ' ' +this.lastName
 }).set(function(this:any,value:string){
    let [firstName,lastName]=value.split(' ')
    this.firstName=firstName
    this.lastName=lastName
 })
-const userModel=MongooseModule.forFeature([{name:User.name,schema:userSchema}])
+export type HUserDocument=HydratedDocument<User>
+export const UserModel=MongooseModule.forFeature([{name:User.name,schema:userSchema}])

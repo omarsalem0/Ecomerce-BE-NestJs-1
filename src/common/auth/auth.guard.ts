@@ -10,8 +10,9 @@ export class AuthGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request=context.switchToHttp().getRequest<Request & {user:JwtPayload |string}>()
-    if(request.headers.authorization){
-      throw new BadRequestException('token is not foubd') 
+  
+    if(!request.headers.authorization){
+      throw new BadRequestException('token is not found') 
     }
     let [flag,token]=request.headers.authorization?.split(' ') as string[]
     if (flag !== 'Bearer' || !token) throw new UnauthorizedException('invalid token format')

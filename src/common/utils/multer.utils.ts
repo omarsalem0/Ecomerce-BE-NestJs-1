@@ -5,7 +5,7 @@ import { MulterEnums } from '../enums/multer.enums.js';
 import { Request } from 'express';
 import { BadRequestException, UnsupportedMediaTypeException } from '@nestjs/common';
 
-export const multerOption=({storageKey=MulterEnums.memoryStorage}:{
+export const multerOption=({storageKey=MulterEnums.diskStorage}:{
     storageKey?:MulterEnums
 })=>{
 

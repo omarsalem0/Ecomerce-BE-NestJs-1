@@ -7,8 +7,6 @@ dotenv.config({path:['.env.dev','.env.prod']})
 // const env_mood=process.env.ENV_MOOD
 
 
-// const googleEmail =process.env.GOOGLE_ACOUNCT_EMAIL
-// const googleAppPassword= process.env.GOOGLE_APP_PASSWORD
 // const serverUrl=process.env.SERVER_URL
 
 // const client_Id=process.env.CLIENT_ID
@@ -49,6 +47,17 @@ export const env ={
     },
     get api_secret(){
         return process.env.API_SECRET  as string
+    },
+    get googleEmail(){
+        return process.env.GOOGLE_ACOUNCT_EMAIL
+        
+    },
+    get googleAppPassword(){
+        return process.env.GOOGLE_APP_PASSWORD
+        
+    },
+    get serverUrl(){
+        return process.env.SERVER_URL
     }
 
 }

@@ -4,7 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Request } from 'express';
 import { JwtPayload } from "jsonwebtoken";
 import { Model } from 'mongoose';
-import { User } from '../../model/user.model.js';
+import { User } from '../../db/model/user.model.js';
 import { ROLES_KEY } from '../decorators/roles.decorators.js';
 @Injectable()
 export class checkRoleGuard implements CanActivate {
@@ -18,6 +18,8 @@ export class checkRoleGuard implements CanActivate {
         ROLES_KEY,
         [context.getHandler(),context.getClass()]
     )
+    console.log(roles,"dsaol");
+    
     if (!roles?.length) {
       return true;
     }
@@ -27,6 +29,8 @@ export class checkRoleGuard implements CanActivate {
     if (!existUser) {
         throw new NotFoundException("user is not found")
     }
+    console.log(existUser);
+    
      if (!roles.includes(+existUser.role)) {
         throw new ForbiddenException('unauthorized for Api')
       }
