@@ -1,4 +1,4 @@
-import { Category } from './../../db/model/catedory.model.js';
+import { Category } from './../../db/model/category.model.js';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto.js';
 import { UpdateCategoryDto } from './dto/update-category.dto.js';
@@ -52,9 +52,9 @@ export class CategoryService {
     let exsistCategory=await this._categoryModel.findById(id)
     if(!exsistCategory) throw new BadRequestException("category for id is not found")
   
-  let updatedCatedory=await this._categoryModel.findByIdAndUpdate(id,{name,image:imagUrl},{new:true})
-  if(!updatedCatedory) throw new BadRequestException("something went wrong for updated category")
-    return updatedCatedory
+  let updatedCategory=await this._categoryModel.findByIdAndUpdate(id,{name,image:imagUrl},{new:true})
+  if(!updatedCategory) throw new BadRequestException("something went wrong for updated category")
+    return updatedCategory
   }
 
   async remove(id: string) {

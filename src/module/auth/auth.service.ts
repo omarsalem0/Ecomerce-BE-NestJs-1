@@ -1,6 +1,7 @@
 import { RedisService } from './../../common/service/redis/redis.service.js';
 import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAuthDto, loginDTO, verifyOtpDTO } from './dto/create-auth.dto.js';
+import { UpdateProfileDto } from './dto/update-profile.dto.js';
 import { User } from '../../db/model/user.model.js';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
@@ -87,4 +88,44 @@ export class AuthService {
           }
       }
     }
+
+  async updateProfile(userId: string, data: UpdateProfileDto) {
+    if (!userId) {
+      throw new BadRequestException('user ID is required');
+    }
+
+    const user = await this._userModel.findById(userId);
+    if (!user) {
+      throw new NotFoundException('user is not found');
+    }
+
+    if (data.userName) {
+      user.userName = data.userName;
+    }
+    if (data.firstName) {
+      user.firstName = data.firstName;
+    }
+    if (data.lastName) {
+      user.lastName = data.lastName;
+    }
+    if (data.phone !== undefined) {
+      user.phone = data.phone;
+    }
+    if (data.gender !== undefined) {
+      user.gender = data.gender;
+    }
+    const newAddresses = data.address ?? data.addresses;
+    if (newAddresses !== undefined) {
+      user.address = newAddresses as any;
+    }
+
+    await user.save();
+
+    const userObj = user.toObject ? user.toObject() : { ...user };
+    delete (userObj as any).password;
+    return {
+      message: 'profile updated successfully',
+      user: userObj,
+    };
+  }
 }
